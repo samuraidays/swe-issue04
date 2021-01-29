@@ -1,9 +1,9 @@
-function main(){
-    let title = document.getElementById('title');
+function quize(){
+    let titleId = document.getElementById('title');
     let questionId = document.getElementById('msg');
     let answersContainer = document.getElementById('answer');
-    let genre = document.getElementById('genre');
-    let difficulty = document.getElementById('difficulty');
+    let genreId = document.getElementById('genre');
+    let difficultyId = document.getElementById('difficulty');
 
     //設定
     const quizeState = {
@@ -16,19 +16,17 @@ function main(){
     getQuizData();
 
     function getQuizData(){
-        title.textContent = '取得中'
+        titleId.textContent = '取得中'
         questionId.textContent = '少々お待ち下さい'
-        start.style.display ="none";
+        start.hidden = true;
 
         fetch(API_URL)
             .then(response => response.json())
             .then((data) => {
-                // クイズデータを取得したら、gameState内の情報をリセットする
                 quizeState.quizzes = data.results;
                 quizeState.currentIndex = 0;
                 quizeState.numberOfCorrects = 0;
     
-                // 一通りクイズに必要な情報を手に入れたのでクイズを開始する。
                 setNextQuiz();
             });
     }
@@ -36,8 +34,7 @@ function main(){
     const setNextQuiz = function() {
         // 問題文と解答を空にしてから、次の問題 or 結果を表示
         questionId.textContent = '';
-        //removeAllAnswers();
-        console.log(quizeState.currentIndex + '<' + quizeState.quizzes.length);
+        removeAllAnswers();
         if(quizeState.currentIndex < quizeState.quizzes.length) {
           const quiz = quizeState.quizzes[quizeState.currentIndex];
           makeQuiz(quiz);
@@ -47,43 +44,49 @@ function main(){
       };
     
     const finishQuiz = function () {
-        questionId.textContent = `XXX点`;
-        console.log("終わり")
+        titleId.textContent = `あなたの点数は${quizeState.numberOfCorrects}/${quizeState.quizzes.length} 点です`;
+        questionId.textContent = '再度開始する場合は開始ボタンをおして下さい';
+        genreId.hidden = true;
+        difficultyId.hidden = true;
         start.hidden = false;
     };
 
-/*     const removeAllAnswers = function() {
-        console.log(answersContainer.firstChild)
+    const removeAllAnswers = function() {
         while (answersContainer.firstChild) {
             answersContainer.removeChild( answersContainer.firstChild );
         }
-    }; */
+    };
 
-    const makeQuiz = function(quiz) {
-        // シャッフル済みの解答一覧を取得する
-        const answers = buildAnswers(quiz);
-        // 問題文のセット
-        questionId.textContent = unescapeHTML(quiz.question);
-        console.log(questionId.textContent)
+    const makeQuiz = (quiz) => {
+      // シャッフル済みの解答一覧を取得する
+      const answers = buildAnswers(quiz);
+
+      // 問題文のセット
+      questionId.textContent = unescapeHTML(quiz.question);
+      quizNum = quizeState.currentIndex + 1;
+      titleId.textContent = '問題' + quizNum;
+      genreId.textContent = '[ジャンル] ' + quiz.category;
+      difficultyId.textContent = '[難易度] ' + quiz.difficulty;
     
-        // 解答一覧をセット
-        answers.forEach((answer) => {
-          const liElement = document.createElement('button');
-          liElement.textContent = unescapeHTML(answer);
-          answersContainer.appendChild(liElement);
+      // 解答一覧をセット
+      answers.forEach((answer) => {
+        const liElement = document.createElement('li');
+        const btnElement = document.createElement('button');
+        liElement.appendChild(btnElement);
+        btnElement.textContent = unescapeHTML(answer);
+        answersContainer.appendChild(liElement);
     
-           liElement.addEventListener('click', (event) => {
-            unescapedCorrectAnswer = unescapeHTML(quiz.correct_answer);
-            if (event.target.textContent === unescapedCorrectAnswer) {
-              quizeState.numberOfCorrects++;
-              alert('Correct answer!!');
-            } else {
-              alert(`Wrong answer... (The correct answer is "${unescapedCorrectAnswer}")`);
-            }})
+        // 解答を選択したときの処理
+        liElement.addEventListener('click', (event) => {
+          unescapedCorrectAnswer = unescapeHTML(quiz.correct_answer);
+          if (event.target.textContent === unescapedCorrectAnswer) {
+            quizeState.numberOfCorrects++;
+          } 
     
-            quizeState.currentIndex++;
-            setNextQuiz();
+          quizeState.currentIndex++;
+          setNextQuiz();
         });
+      });
     };
 
     const buildAnswers = function(quiz) {
@@ -109,5 +112,8 @@ function main(){
 
 let start = document.getElementById('start');
 start.addEventListener('click', (event) => {
-    main();
+    quize();
 });
+
+
+
