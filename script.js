@@ -28,7 +28,10 @@ function quize(){
                 quizeState.numberOfCorrects = 0;
     
                 setNextQuiz();
-            });
+            })
+            .catch((error) => {
+              console.error('Error:', error);
+            })
     //}
 
     const setNextQuiz = function() {
