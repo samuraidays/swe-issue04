@@ -1,9 +1,9 @@
 function quize(){
-    let titleId = document.getElementById('title');
-    let questionId = document.getElementById('msg');
-    let answersContainer = document.getElementById('answer');
-    let genreId = document.getElementById('genre');
-    let difficultyId = document.getElementById('difficulty');
+    const titleId = document.getElementById('title');
+    const questionId = document.getElementById('msg');
+    const answersContainer = document.getElementById('answer');
+    const genreId = document.getElementById('genre');
+    const difficultyId = document.getElementById('difficulty');
 
     //設定
     const quizeState = {
@@ -13,9 +13,9 @@ function quize(){
     };
 
     const API_URL = 'https://opentdb.com/api.php?amount=10&type=multiple';
-    getQuizData();
+    //getQuizData();
 
-    function getQuizData(){
+    //function getQuizData(){
         titleId.textContent = '取得中'
         questionId.textContent = '少々お待ち下さい'
         start.hidden = true;
@@ -29,7 +29,7 @@ function quize(){
     
                 setNextQuiz();
             });
-    }
+    //}
 
     const setNextQuiz = function() {
         // 問題文と解答を空にしてから、次の問題 or 結果を表示
@@ -57,7 +57,7 @@ function quize(){
         }
     };
 
-    const makeQuiz = (quiz) => {
+    const makeQuiz = function(quiz) {
       // シャッフル済みの解答一覧を取得する
       const answers = buildAnswers(quiz);
 
@@ -88,26 +88,6 @@ function quize(){
         });
       });
     };
-
-    const buildAnswers = function(quiz) {
-        const answers = [
-          quiz.correct_answer,
-          ...quiz.incorrect_answers
-        ];
-    
-        return answers;
-    };
-
-    const unescapeHTML = (str) => {
-        const div = document.createElement("div");
-        div.innerHTML = str.replace(/</g,"&lt;")
-                           .replace(/>/g,"&gt;")
-                           .replace(/ /g, "&nbsp;")
-                           .replace(/\r/g, "&#13;")
-                           .replace(/\n/g, "&#10;");
-    
-        return div.textContent || div.innerText;
-    };
 }
 
 let start = document.getElementById('start');
@@ -115,5 +95,30 @@ start.addEventListener('click', (event) => {
     quize();
 });
 
+const buildAnswers = function(quiz) {
+  const answers = [
+    quiz.correct_answer,
+    ...quiz.incorrect_answers
+  ];
 
+  return answers;
+};
+
+const unescapeHTML = function(str) {
+  const div = document.createElement("div");
+  console.log(str);
+  /* div.innerHTML = escape(str); */
+  div.textContent = escape(str);
+
+  return div.textContent || div.innerText;
+};
+
+const escape = function (str) {
+  return str
+    .replace(/(&lt;)/g, '<')
+    .replace(/(&gt;)/g, '>')
+    .replace(/(&quot;)/g, '"')
+    .replace(/(&#039;)/g, "'")
+    .replace(/(&amp;)/g, '&');
+};
 
